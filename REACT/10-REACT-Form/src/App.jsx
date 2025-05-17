@@ -1,21 +1,34 @@
-
 import "./App.css";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import UserDetails from "./components/UserDetails";
 function App() {
+  const [Submitted, setSubmitted] = useState(false);
+  const [SubmittedData, setSubmittedData] = useState(null);
+  const [show, setShow] = useState(false);
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
-  function onSubmit(data) {
+  async function onSubmit(data) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000);
+    });
     console.log("Form submitted:", data);
+    setSubmitted(true);
+    setSubmittedData(data);
   }
+
   return (
     <>
+    <div className="container">
+      <div className="form">
       <form onSubmit={handleSubmit(onSubmit)}>
         <label>First Name: </label>
         <input
-        className={errors.fname?"errorClass":""}
+          className={errors.fname ? "errorClass" : ""}
           {...register("fname", {
             required: "First name is required.",
             maxLength: {
@@ -33,10 +46,8 @@ function App() {
         <br />
         <label>Middle Name: </label>
         <input
-                className={errors.mname?"errorClass":""}
-
+          className={errors.mname ? "errorClass" : ""}
           {...register("mname", {
-            required: "Middle name is required.",
             maxLength: {
               value: 20,
               message: "Middle name should not exceed 20 characters.",
@@ -53,8 +64,7 @@ function App() {
 
         <label>Last Name: </label>
         <input
-                className={errors.lname?"errorClass":""}
-
+          className={errors.lname ? "errorClass" : ""}
           {...register("lname", {
             required: "Last name is required",
             maxLength: {
@@ -72,24 +82,36 @@ function App() {
         <br />
         <label>Password: </label>
         <input
-        className={errors.password?"errorClass":""}
-
+          className={errors.password ? "errorClass" : ""}
           type="password"
-          {...register("password", {
+          {...register("pname", {
             required: "Password is required",
             maxLength: {
               value: 6,
               message: "Password must be 6 characters long",
             },
-             minLength: {
+            minLength: {
               value: 6,
               message: "Password must be 6 characters long",
             },
           })}
         />
         {errors.password && <h2>{errors.password.message}</h2>}
-        <button type="submit">Submit</button>
+        <br />
+        <br />
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting the form...." : "Submit"}
+        </button>
+        <br />
+        {Submitted && (
+          <button type="button" onClick={()=>setShow(true)}>Check User Details</button>
+        )}
+        {show && (
+          <UserDetails data={SubmittedData}/>
+        )}
       </form>
+      </div>
+      </div>
     </>
   );
 }
